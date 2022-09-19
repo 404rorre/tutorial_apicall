@@ -12,7 +12,6 @@ class API_CnE:
 		#Checks if url is existing
 		self.check_url()
 
-
 	def check_url(self):
 		"""Simple check if url is existing."""
 		if self.url and self.headers :
@@ -33,13 +32,30 @@ class API_CnE:
 
 	def create_repo_dict_all(self, repo_dicts):
 		"""Simple method to create a complete dictionary of all entries."""
+		#repo_links -> xaxis, shows url via hyperlink
+		#stars -> yaxis, shows most starred repos
+		#labels -> hovertext, shows repo owner and description
 		repo_links, stars, labels = [], [], []
 		for repo_dict in repo_dicts:
-			repo_links
+			repo_dict = self.create_repo_dict_single(repo_dict)
+			repo_links.append(repo_dict[0])
+			stars.append(repo_dict[1])
+			labels.append(repo_dict[2])
 
+	def create_repo_dict_single(self, repo_dict):
+		"""
+		Simple method to crawl infos from a single dictionary entry.
+		Returns info to outer method.
+		"""
+		repo_name = repo_dict["name"]
+		repo_url = repo_dict["html_url"]
+		repo_link = f"<a href='{repo_url}'>{repo_name}</a>"
+		star = repo_dict["stargazers_count"]
+		owener = repo_dict["owner"]["login"]
+		description = repo_dict["description"]
+		label = f"{owner}<br />{description}"
 
-	def create_repo_dict_single(self,):
-		"""Simple method to create dictionary for a single entry."""
+		return [repo_link, star, label]
 
 	def check_status_code(self)
 		"""Checks if Status Code is 200."""
