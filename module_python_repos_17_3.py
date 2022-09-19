@@ -23,6 +23,7 @@ class API_CnE:
 		"""Starts all programs."""
 		if self.call_flag:
 			self.create_repo_dict_all(self.call_api()["items"])
+			self.create_graph()
 
 	def call_api(self):
 		"""Calls API and gets response."""
@@ -44,10 +45,10 @@ class API_CnE:
 		# 	"labels" : [],
 		# 	}
 		for repo_dict in repo_dicts:
-			repo_dict = self.create_repo_dict_single(repo_dict)
-			self.repo_links.append(repo_dict[0])
-			self.stars.append(repo_dict[1])
-			self.labels.append(repo_dict[2])
+			repo_list = self.create_repo_dict_single(repo_dict)
+			self.repo_links.append(repo_list[0])
+			self.stars.append(repo_list[1])
+			self.labels.append(repo_list[2])
 
 			#Test if api call and info crawling works
 			# self.test_dict_call["repo_links"].append(repo_dict[0])
@@ -71,6 +72,14 @@ class API_CnE:
 			star = 0
 		return [repo_link, star, label]
 
+	def check_status_code(self):
+		"""Checks if Status Code is 200."""
+		if self.r.status_code == 200:
+			pass
+		else:
+			print(f"API Call inconsistent. Status Code: {self.r.status_code}")
+			self.call_flag = False
+
 	def test_api_call(self):
 		"""Simple Class to test returned list from API Call."""
 		#Above self.create_repo_dict_all() uncomment "#" codelines to work.
@@ -82,11 +91,43 @@ class API_CnE:
 			print(self.r.status_code)
 			print(self.test_dict_call)
 
+	def create_graph(self):
+		"""Creates visual overview over from the api call."""
+		data = [{
+			"type" : "bar",
+			"x" : self.repo_links,
+			"y" : self.stars,
+			"hovertext" : self.labels,
+			"marker" : {
+				"color" : "rgb(60, 100, 150)",
+				"line" : {
+					"width" : 1.5,
+					"color": "rgb(25, 25, 25)"
+					}
+				},
+			"opacity" : 0.6,
+			}]
 
-	def check_status_code(self):
-		"""Checks if Status Code is 200."""
-		if self.r.status_code == 200:
-			pass
-		else:
-			print(f"API Call inconsistent. Status Code: {self.r.status_code}")
-			self.call_flag = False
+		my_layout = {
+			"title" : "Most-Starred Python Projects on GitHub",
+			"titlefont" : {"size" : 28},
+			"xaxis" : {
+				"title" : "Repository",
+				"titlefont" : {"size" : 24},
+				"tickfont" : {"size" : 14},
+				},
+			"yaxis" : {
+				"title" : "Stars",
+				"titlefont" : {"size" : 24},
+				"tickfont" : {"size" : 14},
+				}
+			}
+
+		#data is for the extracted data and how they will look like
+		#my_layout is for the axis and the fonts how they will look like
+		fig = {
+			"data" : data,
+			"layout" : my_layout,
+			}
+
+		offline.plot(fig, filename="17_3_python_repos.html")
