@@ -11,6 +11,7 @@ class API_CnE:
 		self.call_flag = False
 		#Checks if url is existing
 		self.check_url()
+		self.check_api()
 
 	def check_url(self):
 		"""Simple check if url is existing."""
@@ -18,6 +19,29 @@ class API_CnE:
 			self.call_flag = True
 		else:
 			print("Please pass url and headers.")
+
+	def check_api(self):
+		"""Simple method to check if api_call is consistent."""
+		self.call_api()
+		self.check_status_code()
+
+	def check_status_code(self):
+		"""Checks if Status Code is 200."""
+		if self.r.status_code == 200:
+			pass
+		else:
+			print(f"API Call inconsistent. Status Code: {self.r.status_code}")
+			self.call_flag = False
+
+	def crash_api(self):
+		"""
+		Simple method to lock api response for test. (ddos denial from github)
+		"""
+		n = 0
+		while self.call_flag:
+			n += 1
+			self.check_api()
+			print(n)
 
 	def start(self):
 		"""Starts all programs."""
@@ -28,7 +52,6 @@ class API_CnE:
 	def call_api(self):
 		"""Calls API and gets response."""
 		self.r = requests.get(self.url_origin, headers=self.headers)
-		self.check_status_code()
 		return self.r.json()
 
 	def create_repo_dict_all(self, repo_dicts):
@@ -71,14 +94,6 @@ class API_CnE:
 		except KeyError:
 			star = 0
 		return [repo_link, star, label]
-
-	def check_status_code(self):
-		"""Checks if Status Code is 200."""
-		if self.r.status_code == 200:
-			pass
-		else:
-			print(f"API Call inconsistent. Status Code: {self.r.status_code}")
-			self.call_flag = False
 
 	def test_api_call(self):
 		"""Simple Class to test returned list from API Call."""
